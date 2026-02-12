@@ -102,33 +102,22 @@
         <section id="shop" class="mt-12">
             <h2 class="text-2xl mb-6">Popular & Featured</h2>
 
-            <!-- If you pass a $products array from controller, it will render them. Otherwise the placeholder items show. -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                @if(isset($products) && count($products) > 0)
-                    @foreach($products as $product)
-                        <article class="glass rounded-lg p-4 flex flex-col">
-                            <img src="{{ $product->image ?? 'https://images.unsplash.com/photo-1504274066651-8d31a536b11a?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder' }}" alt="{{ $product->name }}" class="w-full h-40 object-cover rounded-md mb-3">
-                            <h3 class="text-sm font-semibold">{{ $product->name }}</h3>
-                            <p class="text-xs text-gray-500 flex-1">{{ \Illuminate\Support\Str::limit($product->description ?? '', 80) }}</p>
-                            <div class="mt-3 flex items-center justify-between">
-                                <div class="text-sm font-semibold">₹{{ number_format($product->price, 2) }}</div>
-                                <a href="{{ route('product.show', $product->id) }}" class="text-xs text-indigo-600">View</a>
-                            </div>
-                        </article>
-                    @endforeach
-                @else
-                    @foreach(range(1,8) as $i)
-                        <div class="glass rounded-lg p-4">
-                            <div class="h-40 w-full bg-white/70 rounded-md mb-3 flex items-center justify-center text-gray-400">Image</div>
-                            <h3 class="text-sm font-semibold">{{ ['Amethyst Cluster','Rose Quartz Palm','Citrine Point','Black Tourmaline'][($i-1) % 4] }}</h3>
-                            <p class="text-xs text-gray-500">Hand-picked, cleansed & ready to ship.</p>
-                            <div class="mt-3 flex items-center justify-between">
-                                <div class="text-sm font-semibold">₹{{ [1200,650,900,700][($i-1) % 4] }}</div>
-                                <a href="#" class="text-xs text-indigo-600">View</a>
-                            </div>
+                @forelse($products as $product)
+                    <article class="glass rounded-lg p-4 flex flex-col">
+                        <img src="{{ $product->primaryImage ? asset('storage/' . $product->primaryImage->image_path) : 'https://images.unsplash.com/photo-1504274066651-8d31a536b11a?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder' }}" alt="{{ $product->name }}" class="w-full h-40 object-cover rounded-md mb-3">
+                        <h3 class="text-sm font-semibold">{{ $product->name }}</h3>
+                        <p class="text-xs text-gray-500 flex-1">{{ \Illuminate\Support\Str::limit($product->description ?? '', 80) }}</p>
+                        <div class="mt-3 flex items-center justify-between">
+                            <div class="text-sm font-semibold">₹{{ number_format($product->price, 2) }}</div>
+                            <a href="{{ route('products.show', $product->slug) }}" class="text-xs text-indigo-600">View</a>
                         </div>
-                    @endforeach
-                @endif
+                    </article>
+                @empty
+                    <div class="col-span-full text-center py-12 text-gray-500">
+                        No products available at the moment.
+                    </div>
+                @endforelse
             </div>
         </section>
 
@@ -136,20 +125,17 @@
         <section id="collections" class="mt-12">
             <h2 class="text-2xl mb-6">Curated Collections</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div class="glass rounded-2xl p-6 flex items-center gap-4">
-                    <div class="w-20 h-20 rounded-lg bg-gradient-to-br from-rose-200 to-indigo-200 flex items-center justify-center">🫧</div>
-                    <div>
-                        <h3 class="font-semibold">Love & Harmony</h3>
-                        <p class="text-sm text-gray-600">Rose Quartz, Rhodonite & supportive crystals to open the heart.</p>
-                    </div>
-                </div>
-                <div class="glass rounded-2xl p-6 flex items-center gap-4">
-                    <div class="w-20 h-20 rounded-lg bg-gradient-to-br from-amber-200 to-green-200 flex items-center justify-center">✨</div>
-                    <div>
-                        <h3 class="font-semibold">Energy & Focus</h3>
-                        <p class="text-sm text-gray-600">Citrine, Clear Quartz and grounding points to charge your workspace.</p>
-                    </div>
-                </div>
+                @foreach($collections as $collection)
+                    <a href="{{ route('collections.show', $collection->slug) }}" class="glass rounded-2xl p-6 flex items-center gap-4 hover:bg-white/10 transition">
+                        <div class="w-20 h-20 rounded-lg bg-gradient-to-br from-rose-200 to-indigo-200 flex items-center justify-center text-3xl">
+                            {{ $collection->icon ?? '✨' }}
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">{{ $collection->name }}</h3>
+                            <p class="text-sm text-gray-600">{{ $collection->description }}</p>
+                        </div>
+                    </a>
+                @endforeach
             </div>
         </section>
 
